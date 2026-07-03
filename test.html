@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Legend Live</title>
+
+<style>
+body {
+  margin:0;
+  font-family: Arial;
+  background:#0b0f1a;
+  color:white;
+  text-align:center;
+}
+
+#auth, #app, #roomView {
+  padding:20px;
+}
+
+input {
+  display:block;
+  margin:10px auto;
+  padding:10px;
+  width:220px;
+}
+
+button {
+  padding:10px 15px;
+  margin:5px;
+  cursor:pointer;
+}
+
+.room {
+  background:#1a2233;
+  margin:10px auto;
+  padding:10px;
+  width:250px;
+  border-radius:10px;
+}
+
+.grid {
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:10px;
+  margin-top:20px;
+}
+
+.box {
+  background:#222b3d;
+  height:120px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.box:hover {
+  background:#2d3a55;
+}
+
+.chat {
+  margin-top:15px;
+  background:#111827;
+  padding:10px;
+  border-radius:10px;
+}
+
+.emotes button {
+  font-size:18px;
+  padding:8px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="auth">
+  <h1>Legend Live</h1>
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="login()">Login / Sign Up</button>
+</div>
+
+<div id="app" style="display:none;">
+  <h2>Live Rooms</h2>
+  <button onclick="createRoom()">Create Room</button>
+  <div id="rooms"></div>
+</div>
+
+<div id="roomView" style="display:none;">
+  <h2 id="roomTitle">Live Room</h2>
+
+  <div class="grid">
+    <div class="box" onclick="enterBox(1)">1</div>
+    <div class="box" onclick="enterBox(2)">2</div>
+    <div class="box" onclick="enterBox(3)">3</div>
+    <div class="box" onclick="enterBox(4)">4</div>
+    <div class="box" onclick="enterBox(5)">5</div>
+    <div class="box" onclick="enterBox(6)">6</div>
+    <div class="box" onclick="enterBox(7)">7</div>
+    <div class="box" onclick="enterBox(8)">8</div>
+    <div class="box" onclick="enterBox(9)">9</div>
+    <div class="box" onclick="enterBox(10)">10</div>
+    <div class="box" onclick="enterBox(11)">11</div>
+    <div class="box" onclick="enterBox(12)">12</div>
+  </div>
+
+  <div class="chat">
+    <h3>Chat</h3>
+
+    <div class="emotes">
+      <button onclick="sendEmote('😀')">😀</button>
+      <button onclick="sendEmote('😂')">😂</button>
+      <button onclick="sendEmote('🔥')">🔥</button>
+      <button onclick="sendEmote('💀')">💀</button>
+      <button onclick="sendEmote('❤️')">❤️</button>
+      <button onclick="sendEmote('👍')">👍</button>
+    </div>
+
+    <div id="messages"></div>
+
+    <input id="msg" placeholder="Type message">
+    <button onclick="sendMsg()">Send</button>
+  </div>
+
+  <button onclick="leaveRoom()">Leave Room</button>
+</div>
+
+<script>
+
+let user = null;
+let rooms = [];
+let currentRoom = null;
+let currentBox = null;
+
+let messages = {};
+
+function login() {
+  const email = document.getElementById('email').value;
+  if(!email) return alert("Enter email");
+
+  user = email;
+  localStorage.setItem("user", user);
+
+  document.getElementById('auth').style.display='none';
+  document.getElementById('app').style.display='block';
+}
+
+function createRoom() {
+  const id = "Room-" + (rooms.length + 1);
+  rooms.push(id);
+  renderRooms();
+}
+
+function renderRooms() {
+  const div = document.getElementById("rooms");
+  div.innerHTML = "";
+
+  rooms.forEach(r => {
+    const el = document.createElement("div");
+    el.className = "room";
+    el.innerHTML = r + "<br><button onclick='joinRoom(\""+r+"\")'>Join</button>";
+    div.appendChild(el);
+  });
+}
+
+function joinRoom(room) {
+  currentRoom = room;
+  currentBox = null;
+
+  document.getElementById('app').style.display='none';
+  document.getElementById('roomView').style.display='block';
+
+  document.getElementById('roomTitle').innerText = room;
+
+  if(!messages[room]) messages[room] = [];
+  renderMessages();
+}
+
+function leaveRoom() {
+  document.getElementById('roomView').style.display='none';
+  document.getElementById('app').style.display='block';
+}
+
+function enterBox(num) {
+  currentBox = num;
+  document.getElementById("roomTitle").innerText =
+    currentRoom + " | Box " + num;
+
+  alert("Entered Box " + num);
+}
+
+function sendMsg() {
+  const msg = document.getElementById("msg").value;
+  if(!msg || !currentRoom) return;
+
+  let boxTag = currentBox ? " [Box " + currentBox + "]" : "";
+
+  messages[currentRoom].push(user + boxTag + ": " + msg);
+
+  document.getElementById("msg").value = "";
+  renderMessages();
+}
+
+function sendEmote(emote) {
+  if(!currentRoom) return;
+
+  let boxTag = currentBox ? " [Box " + currentBox + "]" : "";
+
+  messages[currentRoom].push(user + boxTag + ": " + emote);
+
+  renderMessages();
+}
+
+function renderMessages() {
+  const div = document.getElementById("messages");
+  div.innerHTML = "";
+
+  (messages[currentRoom] || []).forEach(m => {
+    const p = document.createElement("p");
+    p.textContent = m;
+    div.appendChild(p);
+  });
+}
+
+</script>
+
+</body>
+</html>
