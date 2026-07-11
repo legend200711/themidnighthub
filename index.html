@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+  <!-- Primary Meta -->
+  <title>The Midnight Hub</title>
+  <meta name="description" content="The Midnight Hub is a community website where users can explore content, connect with others, share posts, and access interactive features." />
+  <meta name="theme-color" content="#000000" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="application-name" content="The Midnight Hub" />
+  <meta name="author" content="The Midnight Hub" />
+
+  <!-- PWA / Mobile -->
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Midnight Hub" />
+  <meta name="msapplication-TileColor" content="#000000" />
+  <meta name="msapplication-TileImage" content="icon-192.png" />
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://legend200711.github.io/themidnighthub/" />
+  <meta property="og:title"       content="The Midnight Hub" />
+  <meta property="og:description" content="A community website to explore, connect, and share." />
+  <meta property="og:image"       content="icon-512.png" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:title"       content="The Midnight Hub" />
+  <meta name="twitter:description" content="A community website to explore, connect, and share." />
+  <meta name="twitter:image"       content="icon-512.png" />
+
+  <!-- Icons -->
+  <link rel="icon"             href="favicon.ico" sizes="any" />
+  <link rel="icon"             href="icon-192.png" type="image/png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="manifest"         href="manifest.json" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     TOP NAV
+══════════════════════════════════════════════════════════ -->
+<nav class="topnav" role="navigation" aria-label="Main navigation">
+
+  <!-- Brand -->
+  <a class="topnav-brand" href="#" onclick="navigate('feed');return false;" aria-label="The Midnight Hub home">
+    <span class="brand-icon" aria-hidden="true">🌙</span>
+    <span>The Midnight Hub</span>
+  </a>
+
+  <!-- Search (desktop) -->
+  <div class="topnav-search" role="search">
+    <span class="search-icon" aria-hidden="true">🔍</span>
+    <input type="search" placeholder="Search people or posts…" aria-label="Search"
+           oninput="navigate('search');document.getElementById('search-input').value=this.value;runSearch();" />
+  </div>
+
+  <!-- Actions -->
+  <div class="topnav-actions">
+
+    <!-- Notifications -->
+    <button class="btn-icon btn notif-btn auth-only hidden" id="notif-toggle-btn"
+            onclick="toggleNotifPanel()" aria-label="Notifications" aria-haspopup="true">
+      🔔
+      <span class="notif-badge hidden" id="notif-badge" aria-label="Unread notifications"></span>
+    </button>
+
+    <!-- User menu (logged in) -->
+    <div class="auth-only hidden" style="display:flex;align-items:center;gap:0.5rem;">
+      <div class="avatar avatar-sm current-user-avatar"
+           onclick="navigate('profile')" role="button" tabindex="0"
+           aria-label="View profile" style="cursor:pointer;"></div>
+      <button class="btn btn-ghost btn-sm" onclick="handleLogout()">Sign Out</button>
+    </div>
+
+    <!-- Sign in (guest) -->
+    <div class="guest-only" style="display:flex;gap:0.5rem;">
+      <button class="btn btn-ghost btn-sm"    onclick="openAuthModal('login')">Sign In</button>
+      <button class="btn btn-primary btn-sm"  onclick="openAuthModal('register')">Join</button>
+    </div>
+  </div>
+</nav>
+
+<!-- Notification panel -->
+<aside class="notif-panel" id="notif-panel" role="dialog" aria-modal="true" aria-label="Notifications">
+  <div class="notif-header">
+    <h3 style="font-size:1rem;">Notifications</h3>
+    <button class="btn-icon btn" onclick="toggleNotifPanel()" aria-label="Close notifications">✕</button>
+  </div>
+  <div id="notif-list"></div>
+</aside>
+
+<!-- ══════════════════════════════════════════════════════════
+     MAIN CONTENT
+══════════════════════════════════════════════════════════ -->
+<main id="app-root">
+<div class="layout">
+
+  <!-- ── LEFT SIDEBAR ─────────────────────────────────────── -->
+  <aside class="sidebar-left" aria-label="Site navigation">
+    <nav class="sidenav" role="navigation">
+      <button class="sidenav-item active" data-page="feed"     onclick="navigate('feed')"     aria-label="Feed">
+        <span class="icon" aria-hidden="true">🏠</span><span class="label">Home</span>
+      </button>
+      <button class="sidenav-item" data-page="search"   onclick="navigate('search')"   aria-label="Search">
+        <span class="icon" aria-hidden="true">🔍</span><span class="label">Explore</span>
+      </button>
+      <button class="sidenav-item auth-only hidden" data-page="messages"  onclick="navigate('messages')"  aria-label="Messages">
+        <span class="icon" aria-hidden="true">✉️</span><span class="label">Messages</span>
+        <span class="count hidden" id="msg-count">0</span>
+      </button>
+      <button class="sidenav-item auth-only hidden" data-page="notifs"    onclick="navigate('notifs')"    aria-label="Notifications">
+        <span class="icon" aria-hidden="true">🔔</span><span class="label">Notifications</span>
+        <span class="count hidden" id="side-notif-count">0</span>
+      </button>
+      <button class="sidenav-item auth-only hidden" data-page="profile"   onclick="navigate('profile')"   aria-label="Profile">
+        <span class="icon" aria-hidden="true">👤</span><span class="label">Profile</span>
+      </button>
+      <button class="sidenav-item auth-only hidden" data-page="settings"  onclick="navigate('settings')"  aria-label="Settings">
+        <span class="icon" aria-hidden="true">⚙️</span><span class="label">Settings</span>
+      </button>
+      <div style="margin-top:1rem;padding:0 0.5rem;" class="guest-only">
+        <button class="btn btn-primary btn-block" onclick="openAuthModal('register')">Join the Hub</button>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- ── CENTRE FEED ──────────────────────────────────────── -->
+  <div class="main-feed">
+
+    <!-- ── PAGE: FEED ───────────────────────────────────── -->
+    <section id="page-feed" class="page active" aria-label="Home feed">
+
+      <!-- Post composer -->
+      <div class="post-composer auth-only hidden">
+        <div class="post-composer-row">
+          <div class="avatar current-user-avatar" aria-hidden="true"></div>
+          <textarea class="composer-textarea" id="post-textarea"
+                    placeholder="What's on your mind tonight?"
+                    maxlength="500" aria-label="Compose a post" rows="3"></textarea>
+        </div>
+        <!-- Image preview -->
+        <div id="image-preview-wrap" class="hidden" style="margin-top:0.75rem;position:relative;display:inline-block;">
+          <img id="image-preview" src="" alt="Image preview" style="max-height:220px;border-radius:8px;display:block;">
+          <button onclick="clearImagePreview()" aria-label="Remove image"
+                  style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.6);border:none;color:#fff;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:0.9rem;">✕</button>
+        </div>
+        <div class="composer-actions">
+          <div class="composer-tools">
+            <button class="btn-icon btn" onclick="triggerImageUpload()" title="Add image" aria-label="Add image">🖼</button>
+            <input type="file" id="image-upload-input" accept="image/*" class="hidden" aria-hidden="true">
+          </div>
+          <button class="btn btn-primary btn-sm" id="submit-post-btn">Post</button>
+        </div>
+      </div>
+
+      <!-- Guest CTA -->
+      <div class="guest-only card text-center" style="margin-bottom:1rem;padding:2rem;">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem;" aria-hidden="true">🌙</div>
+        <h2 style="margin-bottom:0.5rem;">Welcome to The Midnight Hub</h2>
+        <p class="text-muted" style="margin-bottom:1.25rem;">Join the community to post, comment, follow others, and more.</p>
+        <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="openAuthModal('register')">Create Account</button>
+          <button class="btn btn-ghost"   onclick="openAuthModal('login')">Sign In</button>
+        </div>
+      </div>
+
+      <!-- Posts -->
+      <div id="feed-posts" role="feed" aria-label="Posts"></div>
+    </section>
+
+    <!-- ── PAGE: SEARCH ─────────────────────────────────── -->
+    <section id="page-search" class="page" id="search-page" aria-label="Search">
+      <h2 style="margin-bottom:1rem;">Explore</h2>
+      <div class="search-bar-large" role="search">
+        <span aria-hidden="true">🔍</span>
+        <input type="search" id="search-input" placeholder="Search people, posts…"
+               aria-label="Search" oninput="runSearch()" />
+      </div>
+      <div class="search-filters" role="group" aria-label="Search filters">
+        <button class="filter-chip active" data-filter="all"    onclick="setSearchFilter(this)">All</button>
+        <button class="filter-chip"        data-filter="people" onclick="setSearchFilter(this)">People</button>
+        <button class="filter-chip"        data-filter="posts"  onclick="setSearchFilter(this)">Posts</button>
+      </div>
+      <div id="search-results" aria-live="polite" aria-label="Search results"></div>
+    </section>
+
+    <!-- ── PAGE: MESSAGES ───────────────────────────────── -->
+    <section id="page-messages" class="page" aria-label="Messages">
+      <h2 style="margin-bottom:1rem;">Messages</h2>
+      <div class="messages-layout card card-flush">
+        <div class="convo-list" id="convo-list" role="list" aria-label="Conversations">
+          <div style="padding:0.85rem 1rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+            <strong>Conversations</strong>
+          </div>
+        </div>
+        <div class="chat-area" id="chat-area">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:0.75rem;color:var(--text-muted);">
+            <span style="font-size:2.5rem;" aria-hidden="true">✉️</span>
+            <p>Select a conversation or start a new one.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PAGE: NOTIFICATIONS ──────────────────────────── -->
+    <section id="page-notifs" class="page" aria-label="Notifications">
+      <h2 style="margin-bottom:1rem;">Notifications</h2>
+      <div class="card card-flush">
+        <div id="notif-list-page" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- ── PAGE: PROFILE ────────────────────────────────── -->
+    <section id="page-profile" class="page" aria-label="Profile"></section>
+
+    <!-- ── PAGE: SETTINGS ───────────────────────────────── -->
+    <section id="page-settings" class="page" aria-label="Settings">
+      <h2 style="margin-bottom:1.5rem;">Settings</h2>
+
+      <div class="settings-section">
+        <h3>Appearance</h3>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Dark Mode</div>
+            <div class="settings-desc">Use the dark theme (recommended)</div>
+          </div>
+          <label class="toggle" aria-label="Toggle dark mode">
+            <input type="checkbox" id="setting-dark" checked onchange="saveSetting('darkMode', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>Notifications</h3>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Push Notifications</div>
+            <div class="settings-desc">Receive alerts for likes, comments, and messages</div>
+          </div>
+          <label class="toggle" aria-label="Toggle push notifications">
+            <input type="checkbox" id="setting-notifs" checked onchange="saveSetting('notifs', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>Account</h3>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Edit Profile</div>
+            <div class="settings-desc">Update your name, bio, and handle</div>
+          </div>
+          <button class="btn btn-ghost btn-sm auth-only hidden" onclick="navigate('profile');openEditProfile()">Edit</button>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Sign Out</div>
+            <div class="settings-desc">Sign out of your account on this device</div>
+          </div>
+          <button class="btn btn-ghost btn-sm auth-only hidden" onclick="handleLogout()">Sign Out</button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>Privacy &amp; Data</h3>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Clear Local Data</div>
+            <div class="settings-desc">Remove all locally stored data from this device</div>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="clearAllData()">Clear</button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>About</h3>
+        <div class="settings-row">
+          <div class="settings-label">Version</div>
+          <small class="text-muted">1.0.0</small>
+        </div>
+        <div class="settings-row">
+          <div class="settings-label">Website</div>
+          <a href="https://legend200711.github.io/themidnighthub/" target="_blank" rel="noopener noreferrer"
+             style="color:var(--accent);font-size:0.85rem;">themidnighthub</a>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /.main-feed -->
+
+  <!-- ── RIGHT SIDEBAR ──────────────────────────────────── -->
+  <aside class="sidebar-right" aria-label="Suggestions">
+    <div class="card" style="margin-bottom:1rem;">
+      <h3 style="margin-bottom:1rem;font-size:0.95rem;">Who to Follow</h3>
+      <div id="suggested-users"></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:0.75rem;font-size:0.95rem;">About</h3>
+      <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.6;">
+        The Midnight Hub is a community for creators, explorers, and night owls. Connect, share, and grow together.
+      </p>
+      <div style="margin-top:0.75rem;font-size:0.75rem;color:var(--text-faint);">
+        © 2024 The Midnight Hub
+      </div>
+    </div>
+  </aside>
+
+</div><!-- /.layout -->
+</main>
+
+<!-- ══════════════════════════════════════════════════════════
+     BOTTOM MOBILE NAV
+══════════════════════════════════════════════════════════ -->
+<nav class="bottom-nav" aria-label="Mobile navigation">
+  <div class="bottom-nav-inner">
+    <button class="bottom-nav-btn active" data-page="feed"     onclick="navigate('feed')"     aria-label="Home">
+      <span class="nav-icon" aria-hidden="true">🏠</span>Home
+    </button>
+    <button class="bottom-nav-btn" data-page="search"   onclick="navigate('search')"   aria-label="Explore">
+      <span class="nav-icon" aria-hidden="true">🔍</span>Explore
+    </button>
+    <button class="bottom-nav-btn auth-only hidden" data-page="messages" onclick="navigate('messages')" aria-label="Messages">
+      <span class="nav-icon" aria-hidden="true">✉️</span>Messages
+    </button>
+    <button class="bottom-nav-btn auth-only hidden" data-page="profile"  onclick="navigate('profile')"  aria-label="Profile">
+      <span class="nav-icon" aria-hidden="true">👤</span>Profile
+    </button>
+    <button class="bottom-nav-btn auth-only hidden" data-page="settings" onclick="navigate('settings')" aria-label="Settings">
+      <span class="nav-icon" aria-hidden="true">⚙️</span>Settings
+    </button>
+    <button class="bottom-nav-btn guest-only" onclick="openAuthModal('login')" aria-label="Sign In">
+      <span class="nav-icon" aria-hidden="true">🔑</span>Sign In
+    </button>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════════
+     TOAST CONTAINER
+══════════════════════════════════════════════════════════ -->
+<div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PWA INSTALL BANNER
+══════════════════════════════════════════════════════════ -->
+<div class="install-banner hidden" id="install-banner" role="complementary" aria-label="Install app">
+  <span style="font-size:1.8rem;" aria-hidden="true">🌙</span>
+  <div class="install-text">
+    <strong>Add to Home Screen</strong><br>
+    Install The Midnight Hub for a faster, full-screen experience.
+  </div>
+  <button class="btn btn-primary btn-sm" onclick="installPWA()">Install</button>
+  <button class="btn-icon btn" onclick="document.getElementById('install-banner').classList.add('hidden')" aria-label="Dismiss">✕</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     AUTH MODAL (Login / Register)
+══════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title"
+     onclick="if(event.target===this) closeAuthModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="auth-modal-title" style="font-size:1.2rem;">🌙 The Midnight Hub</h2>
+      <button class="modal-close" onclick="closeAuthModal()" aria-label="Close">✕</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="auth-tabs" role="tablist">
+      <button class="auth-tab active" data-tab="login"    role="tab" aria-selected="true"
+              onclick="switchAuthTab('login')">Sign In</button>
+      <button class="auth-tab"        data-tab="register" role="tab" aria-selected="false"
+              onclick="switchAuthTab('register')">Create Account</button>
+    </div>
+
+    <!-- Login -->
+    <form id="auth-login-form" onsubmit="handleLogin(event)" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="login-email">Email</label>
+        <input class="form-control" type="email" id="login-email"
+               placeholder="you@example.com" autocomplete="email" required aria-required="true">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="login-pass">Password</label>
+        <div class="input-group">
+          <input class="form-control" type="password" id="login-pass"
+                 placeholder="Your password" autocomplete="current-password" required aria-required="true">
+          <span class="input-icon" onclick="togglePasswordVis('login-pass',this)" role="button" tabindex="0" aria-label="Toggle password visibility">👁</span>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Sign In</button>
+      <div class="divider">or</div>
+      <p style="font-size:0.85rem;text-align:center;color:var(--text-muted);">
+        Don't have an account?
+        <button type="button" onclick="switchAuthTab('register')"
+                style="background:none;border:none;color:var(--accent);cursor:pointer;font-weight:600;">Join now</button>
+      </p>
+    </form>
+
+    <!-- Register -->
+    <form id="auth-register-form" class="hidden" onsubmit="handleRegister(event)" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="reg-name">Display Name</label>
+        <input class="form-control" type="text" id="reg-name"
+               placeholder="Your name" autocomplete="name" required aria-required="true" maxlength="50">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="reg-email">Email</label>
+        <input class="form-control" type="email" id="reg-email"
+               placeholder="you@example.com" autocomplete="email" required aria-required="true">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="reg-pass">Password</label>
+        <div class="input-group">
+          <input class="form-control" type="password" id="reg-pass"
+                 placeholder="At least 6 characters" autocomplete="new-password" required aria-required="true" minlength="6">
+          <span class="input-icon" onclick="togglePasswordVis('reg-pass',this)" role="button" tabindex="0" aria-label="Toggle password visibility">👁</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="reg-confirm">Confirm Password</label>
+        <input class="form-control" type="password" id="reg-confirm"
+               placeholder="Repeat password" autocomplete="new-password" required aria-required="true">
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Create Account</button>
+      <p style="font-size:0.78rem;color:var(--text-faint);text-align:center;margin-top:0.75rem;">
+        By joining you agree to our community guidelines.
+      </p>
+    </form>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     EDIT PROFILE MODAL
+══════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="edit-profile-modal" role="dialog" aria-modal="true" aria-labelledby="edit-profile-title"
+     onclick="if(event.target===this) closeEditProfile()">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="edit-profile-title" style="font-size:1.2rem;">Edit Profile</h2>
+      <button class="modal-close" onclick="closeEditProfile()" aria-label="Close">✕</button>
+    </div>
+    <form id="edit-profile-form" onsubmit="saveProfile(event)" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="edit-name">Display Name</label>
+        <input class="form-control" type="text" id="edit-name" placeholder="Your name" required aria-required="true" maxlength="50">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="edit-handle">Username</label>
+        <div class="input-group">
+          <input class="form-control" type="text" id="edit-handle" placeholder="yourhandle" maxlength="30"
+                 style="padding-left:1.8rem;">
+          <span style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;">@</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="edit-bio">Bio</label>
+        <textarea class="form-control" id="edit-bio" placeholder="Tell the community about yourself…" maxlength="200" rows="3"></textarea>
+      </div>
+      <div style="display:flex;gap:0.75rem;justify-content:flex-end;">
+        <button type="button" class="btn btn-ghost" onclick="closeEditProfile()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     INLINE SCRIPTS section removed — moved after script.js load
+══════════════════════════════════════════════════════════ -->
+
+<!-- Firebase compat SDK (v9 compat = global `firebase` object) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<!-- Main app script -->
+<script src="script.js"></script>
+
+<!-- Post-load helpers (run after script.js defines all functions) -->
+<script>
+  // Render suggested users in right sidebar
+  async function renderSuggestedUsers() {
+    const container = document.getElementById('suggested-users');
+    if (!container) return;
+
+    let users = [];
+    if (!App.useLocalFallback && App.db) {
+      try {
+        const snap = await App.db.ref('users').once('value');
+        snap.forEach(c => users.push({ uid: c.key, ...c.val() }));
+      } catch(e) { /* ignore */ }
+    } else {
+      users = LocalDB.get('users') || [];
+    }
+
+    const current   = App.currentUser;
+    const following = Array.isArray(current?.following)
+      ? current.following
+      : Object.keys(current?.following || {});
+
+    const suggestions = users
+      .filter(u => u.uid !== current?.uid && !following.includes(u.uid))
+      .slice(0, 4);
+
+    if (suggestions.length === 0) {
+      container.innerHTML = '<p style="font-size:0.82rem;color:var(--text-muted);">No suggestions yet.</p>';
+      return;
+    }
+    container.innerHTML = '';
+    suggestions.forEach(u => {
+      const isFollowing = following.includes(u.uid);
+      const div = document.createElement('div');
+      div.style.cssText = 'display:flex;align-items:center;gap:0.6rem;margin-bottom:0.75rem;';
+      div.innerHTML = `
+        <div class="avatar avatar-sm" style="cursor:pointer;background:${avatarColor(u.name)}"
+             onclick="navigate('profile',{uid:'${u.uid}'})">${avatarInitials(u.name)}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:600;font-size:0.85rem;cursor:pointer;"
+               onclick="navigate('profile',{uid:'${u.uid}'})">${esc(u.name)}</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);">${esc(u.handle||'')}</div>
+        </div>
+        <button class="btn btn-sm ${isFollowing ? 'btn-ghost' : 'btn-primary'}"
+                onclick="toggleFollow('${u.uid}');setTimeout(renderSuggestedUsers,300)">
+          ${isFollowing ? 'Unfollow' : 'Follow'}
+        </button>`;
+      container.appendChild(div);
+    });
+  }
+
+  // Toggle password field visibility
+  function togglePasswordVis(inputId, icon) {
+    const inp = document.getElementById(inputId);
+    if (!inp) return;
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    icon.textContent = inp.type === 'password' ? '👁' : '🙈';
+  }
+</script>
+</body>
+</html>

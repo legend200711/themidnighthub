@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://legend200711.github.io/themidnighthub/sitemap.xml
