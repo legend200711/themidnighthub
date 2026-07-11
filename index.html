@@ -1,549 +1,648 @@
 <!DOCTYPE html>
-<html lang="en-US">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-  <!-- Primary Meta -->
-  <title>The Midnight Hub</title>
-  <meta name="description" content="The Midnight Hub is a community website where users can explore content, connect with others, share posts, and access interactive features." />
-  <meta name="theme-color" content="#000000" />
-  <meta name="color-scheme" content="dark" />
-  <meta name="application-name" content="The Midnight Hub" />
-  <meta name="author" content="The Midnight Hub" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Legend Chat Pro - Horror Mode</title>
 
-  <!-- PWA / Mobile -->
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Midnight Hub" />
-  <meta name="msapplication-TileColor" content="#000000" />
-  <meta name="msapplication-TileImage" content="icon-192.png" />
+<meta name="theme-color" content="#0a0000">
 
-  <!-- Open Graph -->
-  <meta property="og:type"        content="website" />
-  <meta property="og:url"         content="https://legend200711.github.io/themidnighthub/" />
-  <meta property="og:title"       content="The Midnight Hub" />
-  <meta property="og:description" content="A community website to explore, connect, and share." />
-  <meta property="og:image"       content="icon-512.png" />
+<style>
 
-  <!-- Twitter Card -->
-  <meta name="twitter:card"        content="summary_large_image" />
-  <meta name="twitter:title"       content="The Midnight Hub" />
-  <meta name="twitter:description" content="A community website to explore, connect, and share." />
-  <meta name="twitter:image"       content="icon-512.png" />
+/* ░░ GLOBAL RESET */
+html, body{
+    margin:0;
+    padding:0;
+    height:100%;
+    overflow:hidden;
+    font-family:Arial;
+    color:#d0c8c0;
+    background:#0a0000;
+}
 
-  <!-- Icons -->
-  <link rel="icon"             href="favicon.ico" sizes="any" />
-  <link rel="icon"             href="icon-192.png" type="image/png" />
-  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
-  <link rel="manifest"         href="manifest.json" />
+/* ░░ BACKGROUND */
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background-image:url("wolf.png");
+    background-size:cover;
+    background-position:center;
+    z-index:-3;
+    filter:brightness(0.35) contrast(1.3) saturate(0.4);
+}
 
-  <!-- Stylesheet -->
-  <link rel="stylesheet" href="style.css" />
+/* ░░ DEEP VIGNETTE OVERLAY */
+body::after{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:-2;
+    background:radial-gradient(ellipse at center,
+        transparent 30%,
+        rgba(0,0,0,0.65) 70%,
+        rgba(0,0,0,0.92) 100%);
+    pointer-events:none;
+}
+
+/* ░░ FOG LAYER */
+#fogLayer{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    overflow:hidden;
+}
+
+#fogLayer span{
+    position:absolute;
+    bottom:-10%;
+    border-radius:50%;
+    background:rgba(180,160,150,0.055);
+    filter:blur(48px);
+    animation:fogDrift linear infinite;
+}
+
+@keyframes fogDrift{
+    0%  { transform:translateX(0)   translateY(0);   opacity:0;   }
+    15% { opacity:1; }
+    85% { opacity:0.7; }
+    100%{ transform:translateX(var(--fx)) translateY(-115vh); opacity:0; }
+}
+
+/* ░░ ASH CANVAS */
+#ashCanvas{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    z-index:1;
+    pointer-events:none;
+    opacity:0.85;
+}
+
+/* ░░ SLOW SHADOW SWEEP */
+#shadowLayer{
+    position:fixed;
+    inset:0;
+    z-index:2;
+    pointer-events:none;
+    background:linear-gradient(
+        120deg,
+        rgba(0,0,0,0.55) 0%,
+        transparent 50%,
+        rgba(0,0,0,0.55) 100%
+    );
+    background-size:300% 300%;
+    animation:shadowSweep 18s ease-in-out infinite alternate;
+}
+
+@keyframes shadowSweep{
+    0%  { background-position:0% 50%; }
+    100%{ background-position:100% 50%; }
+}
+
+/* ░░ BLOOD-RED AMBIENT GLOW */
+#ambientGlow{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    background:radial-gradient(ellipse at bottom center,
+        rgba(120,0,0,0.18),
+        rgba(60,0,0,0.07),
+        transparent 65%);
+    animation:glowPulse 6s ease-in-out infinite alternate;
+}
+
+@keyframes glowPulse{
+    0%  { opacity:0.6; }
+    100%{ opacity:1; }
+}
+
+/* ░░ HEADER */
+header{
+    position:relative;
+    z-index:10;
+    text-align:center;
+    padding:12px;
+    font-weight:bold;
+    color:#c8a0a0;
+    background:rgba(8,0,0,0.82);
+    border-bottom:1px solid rgba(140,0,0,0.55);
+    backdrop-filter:blur(8px);
+    letter-spacing:1px;
+    text-shadow:0 0 12px rgba(180,0,0,0.7);
+}
+
+/* ░░ ROOM SCREEN */
+#roomScreen{
+    position:fixed;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    background:rgba(0,0,0,0.93);
+    z-index:999;
+}
+
+#roomScreen h2{
+    color:#cc2222;
+    text-shadow:0 0 18px rgba(200,0,0,0.8);
+    letter-spacing:2px;
+    margin-bottom:6px;
+}
+
+/* ░░ ROOM INPUTS */
+#roomScreen input{
+    padding:12px;
+    border-radius:10px;
+    border:1px solid rgba(140,0,0,0.5);
+    margin-top:10px;
+    background:#1a0505;
+    color:#d8c0c0;
+    text-align:center;
+    outline:none;
+    transition:border-color .3s;
+}
+
+#roomScreen input:focus{
+    border-color:rgba(200,0,0,0.8);
+    box-shadow:0 0 10px rgba(160,0,0,0.4);
+}
+
+/* ░░ ROOM BUTTONS */
+#roomScreen button{
+    margin-top:10px;
+    padding:12px 22px;
+    border:1px solid rgba(140,0,0,0.6);
+    border-radius:10px;
+    background:linear-gradient(135deg,#3a0000,#1a0000);
+    color:#cc4444;
+    font-weight:bold;
+    cursor:pointer;
+    letter-spacing:1px;
+    text-shadow:0 0 8px rgba(200,0,0,0.6);
+    transition:background .3s, box-shadow .3s;
+}
+
+#roomScreen button:hover{
+    background:linear-gradient(135deg,#5a0000,#2a0000);
+    box-shadow:0 0 16px rgba(180,0,0,0.5);
+}
+
+/* ░░ CHAT */
+#chat{
+    position:relative;
+    z-index:10;
+    height:calc(100vh - 140px);
+    overflow-y:auto;
+    padding:12px;
+    scrollbar-width:thin;
+    scrollbar-color:rgba(120,0,0,0.5) transparent;
+}
+
+/* ░░ MESSAGE BUBBLE */
+.msg{
+    background:linear-gradient(145deg,rgba(18,5,5,0.88),rgba(26,8,8,0.82),rgba(10,0,0,0.9));
+    padding:12px;
+    margin-bottom:10px;
+    border-radius:14px;
+    border:1px solid rgba(120,0,0,0.3);
+    word-break:break-word;
+    backdrop-filter:blur(4px);
+    box-shadow:0 2px 12px rgba(0,0,0,0.6);
+    transition:border-color .3s;
+}
+
+.msg:hover{
+    border-color:rgba(160,0,0,0.5);
+}
+
+.msg b{
+    color:#cc4040;
+    text-shadow:0 0 6px rgba(160,0,0,0.5);
+}
+
+/* ░░ REACTIONS */
+.reactions{
+    margin-top:8px;
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+}
+
+.reactions button{
+    font-size:14px;
+    padding:4px 8px;
+    border-radius:8px;
+    border:1px solid rgba(120,0,0,0.3);
+    cursor:pointer;
+    background:rgba(80,0,0,0.25);
+    color:#d0b0b0;
+    transition:background .2s, box-shadow .2s;
+}
+
+.reactions button:hover{
+    background:rgba(120,0,0,0.4);
+    box-shadow:0 0 8px rgba(160,0,0,0.4);
+}
+
+/* ░░ REACTION COUNT */
+.reaction-count{
+    font-size:12px;
+    margin-left:4px;
+    color:#a07070;
+}
+
+/* ░░ INPUT BAR */
+.bottom{
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    display:flex;
+    gap:8px;
+    padding:10px;
+    background:rgba(8,0,0,0.88);
+    z-index:10;
+    backdrop-filter:blur(10px);
+    border-top:1px solid rgba(100,0,0,0.4);
+}
+
+.bottom input{
+    border:1px solid rgba(100,0,0,0.4);
+    padding:12px;
+    border-radius:10px;
+    outline:none;
+    background:#150202;
+    color:#d0c0c0;
+    transition:border-color .3s;
+}
+
+.bottom input:focus{
+    border-color:rgba(180,0,0,0.7);
+    box-shadow:0 0 8px rgba(140,0,0,0.35);
+}
+
+#name{ width:90px; }
+#message{ flex:1; }
+
+/* ░░ SEND / ACTION BUTTONS */
+button{
+    padding:12px 14px;
+    border:1px solid rgba(120,0,0,0.5);
+    border-radius:10px;
+    background:linear-gradient(135deg,#3a0000,#1a0000);
+    color:#cc4444;
+    font-weight:bold;
+    cursor:pointer;
+    text-shadow:0 0 6px rgba(180,0,0,0.5);
+    transition:background .3s, box-shadow .3s;
+}
+
+button:hover{
+    background:linear-gradient(135deg,#560000,#2a0000);
+    box-shadow:0 0 14px rgba(160,0,0,0.45);
+}
+
+/* ░░ EMOJI BURST */
+@keyframes emojiPop{
+    0%  { transform:translateY(0) scale(0.6); opacity:1; }
+    100%{ transform:translateY(-44px) scale(1.4); opacity:0; }
+}
+
+.emoji-float{
+    position:absolute;
+    font-size:22px;
+    animation:emojiPop 800ms ease-out forwards;
+    pointer-events:none;
+    z-index:99999;
+}
+
+/* ░░ EMOJI PICKER */
+#emojiPicker{
+    position:fixed;
+    bottom:70px;
+    left:10px;
+    right:10px;
+    display:none;
+    flex-wrap:wrap;
+    gap:6px;
+    padding:10px;
+    background:rgba(10,0,0,0.97);
+    border:1px solid rgba(120,0,0,0.45);
+    border-radius:12px;
+    max-height:180px;
+    overflow-y:auto;
+    z-index:9999;
+    box-shadow:0 0 24px rgba(100,0,0,0.4);
+}
+
+#emojiPicker span{ font-size:28px; cursor:pointer; }
+#emojiBtn{ width:52px; font-size:22px; }
+
+</style>
+
 </head>
+
 <body>
 
-<!-- ══════════════════════════════════════════════════════════
-     TOP NAV
-══════════════════════════════════════════════════════════ -->
-<nav class="topnav" role="navigation" aria-label="Main navigation">
+<canvas id="ashCanvas"></canvas>
+<div id="fogLayer"></div>
+<div id="ambientGlow"></div>
+<div id="shadowLayer"></div>
 
-  <!-- Brand -->
-  <a class="topnav-brand" href="#" onclick="navigate('feed');return false;" aria-label="The Midnight Hub home">
-    <span class="brand-icon" aria-hidden="true">🌙</span>
-    <span>The Midnight Hub</span>
-  </a>
-
-  <!-- Search (desktop) -->
-  <div class="topnav-search" role="search">
-    <span class="search-icon" aria-hidden="true">🔍</span>
-    <input type="search" placeholder="Search people or posts…" aria-label="Search"
-           oninput="navigate('search');document.getElementById('search-input').value=this.value;runSearch();" />
-  </div>
-
-  <!-- Actions -->
-  <div class="topnav-actions">
-
-    <!-- Notifications -->
-    <button class="btn-icon btn notif-btn auth-only hidden" id="notif-toggle-btn"
-            onclick="toggleNotifPanel()" aria-label="Notifications" aria-haspopup="true">
-      🔔
-      <span class="notif-badge hidden" id="notif-badge" aria-label="Unread notifications"></span>
-    </button>
-
-    <!-- User menu (logged in) -->
-    <div class="auth-only hidden" style="display:flex;align-items:center;gap:0.5rem;">
-      <div class="avatar avatar-sm current-user-avatar"
-           onclick="navigate('profile')" role="button" tabindex="0"
-           aria-label="View profile" style="cursor:pointer;"></div>
-      <button class="btn btn-ghost btn-sm" onclick="handleLogout()">Sign Out</button>
-    </div>
-
-    <!-- Sign in (guest) -->
-    <div class="guest-only" style="display:flex;gap:0.5rem;">
-      <button class="btn btn-ghost btn-sm"    onclick="openAuthModal('login')">Sign In</button>
-      <button class="btn btn-primary btn-sm"  onclick="openAuthModal('register')">Join</button>
-    </div>
-  </div>
-</nav>
-
-<!-- Notification panel -->
-<aside class="notif-panel" id="notif-panel" role="dialog" aria-modal="true" aria-label="Notifications">
-  <div class="notif-header">
-    <h3 style="font-size:1rem;">Notifications</h3>
-    <button class="btn-icon btn" onclick="toggleNotifPanel()" aria-label="Close notifications">✕</button>
-  </div>
-  <div id="notif-list"></div>
-</aside>
-
-<!-- ══════════════════════════════════════════════════════════
-     MAIN CONTENT
-══════════════════════════════════════════════════════════ -->
-<main id="app-root">
-<div class="layout">
-
-  <!-- ── LEFT SIDEBAR ─────────────────────────────────────── -->
-  <aside class="sidebar-left" aria-label="Site navigation">
-    <nav class="sidenav" role="navigation">
-      <button class="sidenav-item active" data-page="feed"     onclick="navigate('feed')"     aria-label="Feed">
-        <span class="icon" aria-hidden="true">🏠</span><span class="label">Home</span>
-      </button>
-      <button class="sidenav-item" data-page="search"   onclick="navigate('search')"   aria-label="Search">
-        <span class="icon" aria-hidden="true">🔍</span><span class="label">Explore</span>
-      </button>
-      <button class="sidenav-item auth-only hidden" data-page="messages"  onclick="navigate('messages')"  aria-label="Messages">
-        <span class="icon" aria-hidden="true">✉️</span><span class="label">Messages</span>
-        <span class="count hidden" id="msg-count">0</span>
-      </button>
-      <button class="sidenav-item auth-only hidden" data-page="notifs"    onclick="navigate('notifs')"    aria-label="Notifications">
-        <span class="icon" aria-hidden="true">🔔</span><span class="label">Notifications</span>
-        <span class="count hidden" id="side-notif-count">0</span>
-      </button>
-      <button class="sidenav-item auth-only hidden" data-page="profile"   onclick="navigate('profile')"   aria-label="Profile">
-        <span class="icon" aria-hidden="true">👤</span><span class="label">Profile</span>
-      </button>
-      <button class="sidenav-item auth-only hidden" data-page="settings"  onclick="navigate('settings')"  aria-label="Settings">
-        <span class="icon" aria-hidden="true">⚙️</span><span class="label">Settings</span>
-      </button>
-      <div style="margin-top:1rem;padding:0 0.5rem;" class="guest-only">
-        <button class="btn btn-primary btn-block" onclick="openAuthModal('register')">Join the Hub</button>
-      </div>
-    </nav>
-  </aside>
-
-  <!-- ── CENTRE FEED ──────────────────────────────────────── -->
-  <div class="main-feed">
-
-    <!-- ── PAGE: FEED ───────────────────────────────────── -->
-    <section id="page-feed" class="page active" aria-label="Home feed">
-
-      <!-- Post composer -->
-      <div class="post-composer auth-only hidden">
-        <div class="post-composer-row">
-          <div class="avatar current-user-avatar" aria-hidden="true"></div>
-          <textarea class="composer-textarea" id="post-textarea"
-                    placeholder="What's on your mind tonight?"
-                    maxlength="500" aria-label="Compose a post" rows="3"></textarea>
-        </div>
-        <!-- Image preview -->
-        <div id="image-preview-wrap" class="hidden" style="margin-top:0.75rem;position:relative;display:inline-block;">
-          <img id="image-preview" src="" alt="Image preview" style="max-height:220px;border-radius:8px;display:block;">
-          <button onclick="clearImagePreview()" aria-label="Remove image"
-                  style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.6);border:none;color:#fff;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:0.9rem;">✕</button>
-        </div>
-        <div class="composer-actions">
-          <div class="composer-tools">
-            <button class="btn-icon btn" onclick="triggerImageUpload()" title="Add image" aria-label="Add image">🖼</button>
-            <input type="file" id="image-upload-input" accept="image/*" class="hidden" aria-hidden="true">
-          </div>
-          <button class="btn btn-primary btn-sm" id="submit-post-btn">Post</button>
-        </div>
-      </div>
-
-      <!-- Guest CTA -->
-      <div class="guest-only card text-center" style="margin-bottom:1rem;padding:2rem;">
-        <div style="font-size:2.5rem;margin-bottom:0.75rem;" aria-hidden="true">🌙</div>
-        <h2 style="margin-bottom:0.5rem;">Welcome to The Midnight Hub</h2>
-        <p class="text-muted" style="margin-bottom:1.25rem;">Join the community to post, comment, follow others, and more.</p>
-        <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;">
-          <button class="btn btn-primary" onclick="openAuthModal('register')">Create Account</button>
-          <button class="btn btn-ghost"   onclick="openAuthModal('login')">Sign In</button>
-        </div>
-      </div>
-
-      <!-- Posts -->
-      <div id="feed-posts" role="feed" aria-label="Posts"></div>
-    </section>
-
-    <!-- ── PAGE: SEARCH ─────────────────────────────────── -->
-    <section id="page-search" class="page" id="search-page" aria-label="Search">
-      <h2 style="margin-bottom:1rem;">Explore</h2>
-      <div class="search-bar-large" role="search">
-        <span aria-hidden="true">🔍</span>
-        <input type="search" id="search-input" placeholder="Search people, posts…"
-               aria-label="Search" oninput="runSearch()" />
-      </div>
-      <div class="search-filters" role="group" aria-label="Search filters">
-        <button class="filter-chip active" data-filter="all"    onclick="setSearchFilter(this)">All</button>
-        <button class="filter-chip"        data-filter="people" onclick="setSearchFilter(this)">People</button>
-        <button class="filter-chip"        data-filter="posts"  onclick="setSearchFilter(this)">Posts</button>
-      </div>
-      <div id="search-results" aria-live="polite" aria-label="Search results"></div>
-    </section>
-
-    <!-- ── PAGE: MESSAGES ───────────────────────────────── -->
-    <section id="page-messages" class="page" aria-label="Messages">
-      <h2 style="margin-bottom:1rem;">Messages</h2>
-      <div class="messages-layout card card-flush">
-        <div class="convo-list" id="convo-list" role="list" aria-label="Conversations">
-          <div style="padding:0.85rem 1rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-            <strong>Conversations</strong>
-          </div>
-        </div>
-        <div class="chat-area" id="chat-area">
-          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:0.75rem;color:var(--text-muted);">
-            <span style="font-size:2.5rem;" aria-hidden="true">✉️</span>
-            <p>Select a conversation or start a new one.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── PAGE: NOTIFICATIONS ──────────────────────────── -->
-    <section id="page-notifs" class="page" aria-label="Notifications">
-      <h2 style="margin-bottom:1rem;">Notifications</h2>
-      <div class="card card-flush">
-        <div id="notif-list-page" aria-live="polite"></div>
-      </div>
-    </section>
-
-    <!-- ── PAGE: PROFILE ────────────────────────────────── -->
-    <section id="page-profile" class="page" aria-label="Profile"></section>
-
-    <!-- ── PAGE: SETTINGS ───────────────────────────────── -->
-    <section id="page-settings" class="page" aria-label="Settings">
-      <h2 style="margin-bottom:1.5rem;">Settings</h2>
-
-      <div class="settings-section">
-        <h3>Appearance</h3>
-        <div class="settings-row">
-          <div>
-            <div class="settings-label">Dark Mode</div>
-            <div class="settings-desc">Use the dark theme (recommended)</div>
-          </div>
-          <label class="toggle" aria-label="Toggle dark mode">
-            <input type="checkbox" id="setting-dark" checked onchange="saveSetting('darkMode', this.checked)">
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-      </div>
-
-      <div class="settings-section">
-        <h3>Notifications</h3>
-        <div class="settings-row">
-          <div>
-            <div class="settings-label">Push Notifications</div>
-            <div class="settings-desc">Receive alerts for likes, comments, and messages</div>
-          </div>
-          <label class="toggle" aria-label="Toggle push notifications">
-            <input type="checkbox" id="setting-notifs" checked onchange="saveSetting('notifs', this.checked)">
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-      </div>
-
-      <div class="settings-section">
-        <h3>Account</h3>
-        <div class="settings-row">
-          <div>
-            <div class="settings-label">Edit Profile</div>
-            <div class="settings-desc">Update your name, bio, and handle</div>
-          </div>
-          <button class="btn btn-ghost btn-sm auth-only hidden" onclick="navigate('profile');openEditProfile()">Edit</button>
-        </div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-label">Sign Out</div>
-            <div class="settings-desc">Sign out of your account on this device</div>
-          </div>
-          <button class="btn btn-ghost btn-sm auth-only hidden" onclick="handleLogout()">Sign Out</button>
-        </div>
-      </div>
-
-      <div class="settings-section">
-        <h3>Privacy &amp; Data</h3>
-        <div class="settings-row">
-          <div>
-            <div class="settings-label">Clear Local Data</div>
-            <div class="settings-desc">Remove all locally stored data from this device</div>
-          </div>
-          <button class="btn btn-danger btn-sm" onclick="clearAllData()">Clear</button>
-        </div>
-      </div>
-
-      <div class="settings-section">
-        <h3>About</h3>
-        <div class="settings-row">
-          <div class="settings-label">Version</div>
-          <small class="text-muted">1.0.0</small>
-        </div>
-        <div class="settings-row">
-          <div class="settings-label">Website</div>
-          <a href="https://legend200711.github.io/themidnighthub/" target="_blank" rel="noopener noreferrer"
-             style="color:var(--accent);font-size:0.85rem;">themidnighthub</a>
-        </div>
-      </div>
-    </section>
-
-  </div><!-- /.main-feed -->
-
-  <!-- ── RIGHT SIDEBAR ──────────────────────────────────── -->
-  <aside class="sidebar-right" aria-label="Suggestions">
-    <div class="card" style="margin-bottom:1rem;">
-      <h3 style="margin-bottom:1rem;font-size:0.95rem;">Who to Follow</h3>
-      <div id="suggested-users"></div>
-    </div>
-    <div class="card">
-      <h3 style="margin-bottom:0.75rem;font-size:0.95rem;">About</h3>
-      <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.6;">
-        The Midnight Hub is a community for creators, explorers, and night owls. Connect, share, and grow together.
-      </p>
-      <div style="margin-top:0.75rem;font-size:0.75rem;color:var(--text-faint);">
-        © 2024 The Midnight Hub
-      </div>
-    </div>
-  </aside>
-
-</div><!-- /.layout -->
-</main>
-
-<!-- ══════════════════════════════════════════════════════════
-     BOTTOM MOBILE NAV
-══════════════════════════════════════════════════════════ -->
-<nav class="bottom-nav" aria-label="Mobile navigation">
-  <div class="bottom-nav-inner">
-    <button class="bottom-nav-btn active" data-page="feed"     onclick="navigate('feed')"     aria-label="Home">
-      <span class="nav-icon" aria-hidden="true">🏠</span>Home
-    </button>
-    <button class="bottom-nav-btn" data-page="search"   onclick="navigate('search')"   aria-label="Explore">
-      <span class="nav-icon" aria-hidden="true">🔍</span>Explore
-    </button>
-    <button class="bottom-nav-btn auth-only hidden" data-page="messages" onclick="navigate('messages')" aria-label="Messages">
-      <span class="nav-icon" aria-hidden="true">✉️</span>Messages
-    </button>
-    <button class="bottom-nav-btn auth-only hidden" data-page="profile"  onclick="navigate('profile')"  aria-label="Profile">
-      <span class="nav-icon" aria-hidden="true">👤</span>Profile
-    </button>
-    <button class="bottom-nav-btn auth-only hidden" data-page="settings" onclick="navigate('settings')" aria-label="Settings">
-      <span class="nav-icon" aria-hidden="true">⚙️</span>Settings
-    </button>
-    <button class="bottom-nav-btn guest-only" onclick="openAuthModal('login')" aria-label="Sign In">
-      <span class="nav-icon" aria-hidden="true">🔑</span>Sign In
-    </button>
-  </div>
-</nav>
-
-<!-- ══════════════════════════════════════════════════════════
-     TOAST CONTAINER
-══════════════════════════════════════════════════════════ -->
-<div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
-
-<!-- ══════════════════════════════════════════════════════════
-     PWA INSTALL BANNER
-══════════════════════════════════════════════════════════ -->
-<div class="install-banner hidden" id="install-banner" role="complementary" aria-label="Install app">
-  <span style="font-size:1.8rem;" aria-hidden="true">🌙</span>
-  <div class="install-text">
-    <strong>Add to Home Screen</strong><br>
-    Install The Midnight Hub for a faster, full-screen experience.
-  </div>
-  <button class="btn btn-primary btn-sm" onclick="installPWA()">Install</button>
-  <button class="btn-icon btn" onclick="document.getElementById('install-banner').classList.add('hidden')" aria-label="Dismiss">✕</button>
+<div id="roomScreen">
+    <h2>💀 Enter Room Code</h2>
+    <input id="roomInput" placeholder="ROOM123">
+    <input id="nameInput" placeholder="Your Name">
+    <button onclick="joinRoom()">Join Room</button>
+    <button onclick="joinLobby()">Enter Lobby</button>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════
-     AUTH MODAL (Login / Register)
-══════════════════════════════════════════════════════════ -->
-<div class="modal-overlay" id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title"
-     onclick="if(event.target===this) closeAuthModal()">
-  <div class="modal">
-    <div class="modal-header">
-      <h2 id="auth-modal-title" style="font-size:1.2rem;">🌙 The Midnight Hub</h2>
-      <button class="modal-close" onclick="closeAuthModal()" aria-label="Close">✕</button>
-    </div>
+<header id="roomTitle">💀 Legend Chat Pro 💀 | 👥 Online: 0</header>
 
-    <!-- Tabs -->
-    <div class="auth-tabs" role="tablist">
-      <button class="auth-tab active" data-tab="login"    role="tab" aria-selected="true"
-              onclick="switchAuthTab('login')">Sign In</button>
-      <button class="auth-tab"        data-tab="register" role="tab" aria-selected="false"
-              onclick="switchAuthTab('register')">Create Account</button>
-    </div>
+<div id="chat"></div>
 
-    <!-- Login -->
-    <form id="auth-login-form" onsubmit="handleLogin(event)" novalidate>
-      <div class="form-group">
-        <label class="form-label" for="login-email">Email</label>
-        <input class="form-control" type="email" id="login-email"
-               placeholder="you@example.com" autocomplete="email" required aria-required="true">
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="login-pass">Password</label>
-        <div class="input-group">
-          <input class="form-control" type="password" id="login-pass"
-                 placeholder="Your password" autocomplete="current-password" required aria-required="true">
-          <span class="input-icon" onclick="togglePasswordVis('login-pass',this)" role="button" tabindex="0" aria-label="Toggle password visibility">👁</span>
-        </div>
-      </div>
-      <button class="btn btn-primary btn-block" type="submit">Sign In</button>
-      <div class="divider">or</div>
-      <p style="font-size:0.85rem;text-align:center;color:var(--text-muted);">
-        Don't have an account?
-        <button type="button" onclick="switchAuthTab('register')"
-                style="background:none;border:none;color:var(--accent);cursor:pointer;font-weight:600;">Join now</button>
-      </p>
-    </form>
-
-    <!-- Register -->
-    <form id="auth-register-form" class="hidden" onsubmit="handleRegister(event)" novalidate>
-      <div class="form-group">
-        <label class="form-label" for="reg-name">Display Name</label>
-        <input class="form-control" type="text" id="reg-name"
-               placeholder="Your name" autocomplete="name" required aria-required="true" maxlength="50">
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="reg-email">Email</label>
-        <input class="form-control" type="email" id="reg-email"
-               placeholder="you@example.com" autocomplete="email" required aria-required="true">
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="reg-pass">Password</label>
-        <div class="input-group">
-          <input class="form-control" type="password" id="reg-pass"
-                 placeholder="At least 6 characters" autocomplete="new-password" required aria-required="true" minlength="6">
-          <span class="input-icon" onclick="togglePasswordVis('reg-pass',this)" role="button" tabindex="0" aria-label="Toggle password visibility">👁</span>
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="reg-confirm">Confirm Password</label>
-        <input class="form-control" type="password" id="reg-confirm"
-               placeholder="Repeat password" autocomplete="new-password" required aria-required="true">
-      </div>
-      <button class="btn btn-primary btn-block" type="submit">Create Account</button>
-      <p style="font-size:0.78rem;color:var(--text-faint);text-align:center;margin-top:0.75rem;">
-        By joining you agree to our community guidelines.
-      </p>
-    </form>
-  </div>
+<div class="bottom">
+    <input id="name" placeholder="Name">
+    <input id="message" placeholder="Message">
+    <button id="emojiBtn" type="button">😊</button>
+    <button onclick="sendMessage()">Send</button>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════
-     EDIT PROFILE MODAL
-══════════════════════════════════════════════════════════ -->
-<div class="modal-overlay" id="edit-profile-modal" role="dialog" aria-modal="true" aria-labelledby="edit-profile-title"
-     onclick="if(event.target===this) closeEditProfile()">
-  <div class="modal">
-    <div class="modal-header">
-      <h2 id="edit-profile-title" style="font-size:1.2rem;">Edit Profile</h2>
-      <button class="modal-close" onclick="closeEditProfile()" aria-label="Close">✕</button>
-    </div>
-    <form id="edit-profile-form" onsubmit="saveProfile(event)" novalidate>
-      <div class="form-group">
-        <label class="form-label" for="edit-name">Display Name</label>
-        <input class="form-control" type="text" id="edit-name" placeholder="Your name" required aria-required="true" maxlength="50">
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="edit-handle">Username</label>
-        <div class="input-group">
-          <input class="form-control" type="text" id="edit-handle" placeholder="yourhandle" maxlength="30"
-                 style="padding-left:1.8rem;">
-          <span style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;">@</span>
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="edit-bio">Bio</label>
-        <textarea class="form-control" id="edit-bio" placeholder="Tell the community about yourself…" maxlength="200" rows="3"></textarea>
-      </div>
-      <div style="display:flex;gap:0.75rem;justify-content:flex-end;">
-        <button type="button" class="btn btn-ghost" onclick="closeEditProfile()">Cancel</button>
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-      </div>
-    </form>
-  </div>
-</div>
+<div id="emojiPicker"></div>
 
-<!-- ══════════════════════════════════════════════════════════
-     INLINE SCRIPTS (tiny utilities that need DOM access)
-══════════════════════════════════════════════════════════ -->
 <script>
-  // Toggle password field visibility
-  function togglePasswordVis(inputId, icon) {
-    const inp = document.getElementById(inputId);
-    if (!inp) return;
-    inp.type = inp.type === 'password' ? 'text' : 'password';
-    icon.textContent = inp.type === 'password' ? '👁' : '🙈';
-  }
 
-  // Render suggested users in the right sidebar
-  function renderSuggestedUsers() {
-    const container = document.getElementById('suggested-users');
-    if (!container) return;
-    const users   = (typeof LocalDB !== 'undefined' && LocalDB.get('users')) || [];
-    const current = App?.currentUser;
-    const following = current?.following || [];
-    const suggestions = users
-      .filter(u => u.uid !== current?.uid && !following.includes(u.uid))
-      .slice(0, 4);
-
-    if (suggestions.length === 0) {
-      container.innerHTML = '<p style="font-size:0.82rem;color:var(--text-muted);">No suggestions yet.</p>';
-      return;
+/* ░░ FOG PARTICLES */
+(function spawnFog(){
+    const layer = document.getElementById("fogLayer");
+    const count = 9;
+    for(let i = 0; i < count; i++){
+        const s = document.createElement("span");
+        const size = 280 + Math.random() * 400;
+        const delay = Math.random() * 22;
+        const dur   = 28 + Math.random() * 30;
+        const xDrift = (Math.random() - 0.5) * 40 + "vw";
+        s.style.cssText = `
+            width:${size}px; height:${size}px;
+            left:${Math.random() * 110 - 5}%;
+            --fx:${xDrift};
+            animation-duration:${dur}s;
+            animation-delay:-${delay}s;
+        `;
+        layer.appendChild(s);
     }
-    container.innerHTML = '';
-    suggestions.forEach(u => {
-      const isFollowing = following.includes(u.uid);
-      const div = document.createElement('div');
-      div.style.cssText = 'display:flex;align-items:center;gap:0.6rem;margin-bottom:0.75rem;';
-      div.innerHTML = `
-        <div class="avatar avatar-sm" style="cursor:pointer;background:${avatarColor(u.name)}"
-             onclick="navigate('profile',{uid:'${u.uid}'})">${avatarInitials(u.name)}</div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-weight:600;font-size:0.85rem;cursor:pointer;" onclick="navigate('profile',{uid:'${u.uid}'})">${esc(u.name)}</div>
-          <div style="font-size:0.75rem;color:var(--text-muted);">${esc(u.handle||'')}</div>
-        </div>
-        <button class="btn btn-sm ${isFollowing?'btn-ghost':'btn-primary'}"
-                onclick="toggleFollow('${u.uid}');renderSuggestedUsers()">
-          ${isFollowing?'Unfollow':'Follow'}
-        </button>`;
-      container.appendChild(div);
+})();
+
+/* ░░ ASH / EMBER PARTICLES */
+const ashCanvas = document.getElementById("ashCanvas");
+const actx = ashCanvas.getContext("2d");
+
+function resizeAsh(){
+    ashCanvas.width  = window.innerWidth;
+    ashCanvas.height = window.innerHeight;
+}
+resizeAsh();
+window.addEventListener("resize", resizeAsh);
+
+const ASH_COUNT = 90;
+const ashes = Array.from({length: ASH_COUNT}, () => ({
+    x:     Math.random() * window.innerWidth,
+    y:     Math.random() * window.innerHeight,
+    r:     Math.random() * 1.8 + 0.4,
+    speed: Math.random() * 0.5 + 0.15,
+    drift: (Math.random() - 0.5) * 0.4,
+    alpha: Math.random() * 0.55 + 0.15,
+    glow:  Math.random() < 0.18    /* ember glow */
+}));
+
+function drawAsh(){
+    actx.clearRect(0, 0, ashCanvas.width, ashCanvas.height);
+    for(const a of ashes){
+        actx.beginPath();
+        actx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+        if(a.glow){
+            actx.fillStyle = `rgba(220,60,10,${a.alpha})`;
+            actx.shadowColor = "rgba(220,60,10,0.9)";
+            actx.shadowBlur  = 6;
+        } else {
+            actx.fillStyle = `rgba(160,140,130,${a.alpha})`;
+            actx.shadowBlur = 0;
+        }
+        actx.fill();
+
+        a.y     -= a.speed;
+        a.x     += a.drift + Math.sin(a.y * 0.02) * 0.3;
+        a.alpha += (Math.random() - 0.5) * 0.015;
+        a.alpha  = Math.max(0.05, Math.min(0.75, a.alpha));
+
+        if(a.y < -6){
+            a.y = ashCanvas.height + 6;
+            a.x = Math.random() * ashCanvas.width;
+        }
+    }
+    requestAnimationFrame(drawAsh);
+}
+drawAsh();
+
+/* ░░ EMOJI BURST */
+function spawnEmoji(x, y, emoji){
+    const el = document.createElement("div");
+    el.className = "emoji-float";
+    el.textContent = emoji;
+    el.style.left = x + "px";
+    el.style.top  = y + "px";
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 800);
+}
+
+/* ░░ EMOJI PICKER */
+const picker     = document.getElementById("emojiPicker");
+const emojiBtn   = document.getElementById("emojiBtn");
+const messageBox = document.getElementById("message");
+if(picker && emojiBtn && messageBox){
+    const emojis = ["😀","😁","😂","🤣","😊","😍","😘","🥰","😎","🤩","🥳","😭","😡","🤯","😱","👍","👏","🙌","🙏","❤️","🔥","💀","⚡","✨","🎉","🎵","🚀","🐺"];
+    emojis.forEach(e => {
+        let s = document.createElement("span");
+        s.textContent = e;
+        s.onclick = () => { messageBox.value += e; messageBox.focus(); };
+        picker.appendChild(s);
     });
-  }
-
-  // Re-render suggestions after navigation
-  const _origNavigate = typeof navigate === 'function' ? navigate : null;
-  document.addEventListener('DOMContentLoaded', () => {
-    // Run after script.js init
-    setTimeout(() => { if (typeof renderSuggestedUsers === 'function') renderSuggestedUsers(); }, 100);
-  });
-
-  // Override navigate to also refresh suggestions
-  document.addEventListener('DOMContentLoaded', () => {
-    const origNav = window.navigate;
-    window.navigate = function(pageId, opts) {
-      origNav(pageId, opts);
-      setTimeout(renderSuggestedUsers, 50);
-      // Sync notif page list with the panel list
-      if (pageId === 'notifs') {
-        const page = document.getElementById('notif-list-page');
-        const panel = document.getElementById('notif-list');
-        if (page && panel) page.innerHTML = panel.innerHTML || '<p class="text-muted" style="padding:1rem;font-size:0.88rem;">No notifications yet.</p>';
-      }
+    emojiBtn.onclick = (ev) => {
+        ev.stopPropagation();
+        picker.style.display = picker.style.display === "flex" ? "none" : "flex";
     };
-  });
+    document.addEventListener("click", e => {
+        if(!picker.contains(e.target) && e.target !== emojiBtn)
+            picker.style.display = "none";
+    });
+}
+
 </script>
 
-<!-- Main app script -->
-<script src="script.js"></script>
+<script type="module">
+
+/* ░░ FIREBASE */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+import {
+  getDatabase, ref, push, onChildAdded,
+  remove, set, onDisconnect, onValue,
+  off
+} from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAOnAtWJ...",
+  authDomain: "legend-chat-246fd.firebaseapp.com",
+  databaseURL: "https://legend-chat-246fd-default-rtdb.firebaseio.com",
+  projectId: "legend-chat-246fd",
+  storageBucket: "legend-chat-246fd.firebasestorage.app",
+  messagingSenderId: "365662264136",
+  appId: "1:365662264136:web:1c7cfb6db3f09a6fa1f17d"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+
+let chatRef            = null;
+let presenceRef        = null;
+let presenceListenerRef= null;
+let currentRoom        = null;
+
+let userId = crypto.randomUUID();
+
+/* ░░ JOIN */
+window.joinRoom = function(){
+    const room = document.getElementById("roomInput").value.trim().toUpperCase();
+    const name = document.getElementById("nameInput").value.trim() || "Ghost";
+    if(!room) return;
+    enterRoom(room, name);
+};
+
+window.joinLobby = function(){
+    const name = document.getElementById("nameInput").value.trim() || "Ghost";
+    enterRoom("LOBBY", name);
+};
+
+function enterRoom(room, name){
+    if(chatRef) off(chatRef);
+    if(presenceListenerRef) off(presenceListenerRef);
+
+    currentRoom = room;
+
+    document.getElementById("roomScreen").style.display = "none";
+    document.getElementById("chat").innerHTML = "";
+    document.getElementById("name").value = name;
+    document.getElementById("roomTitle").innerText =
+        `💀 Room: ${room} | 👥 Online: 0`;
+
+    chatRef = ref(db, "rooms/" + room + "/messages");
+
+    setupPresence(room, name);
+    listenMessages();
+}
+
+/* ░░ PRESENCE */
+function setupPresence(room, name){
+    presenceRef = ref(db, `rooms/${room}/presence/${userId}`);
+    set(presenceRef, { name, online: true });
+    onDisconnect(presenceRef).remove();
+
+    presenceListenerRef = ref(db, `rooms/${room}/presence`);
+    onValue(presenceListenerRef, (snap) => {
+        const data  = snap.val() || {};
+        const count = Object.keys(data).length;
+        document.getElementById("roomTitle").innerText =
+            `💀 Room: ${room} | 👥 Online: ${count}`;
+    });
+}
+
+/* ░░ MESSAGES */
+function listenMessages(){
+    onChildAdded(chatRef, (snap) => {
+        const d     = snap.val();
+        const msgId = snap.key;
+
+        const div = document.createElement("div");
+        div.className = "msg";
+        div.innerHTML = `<b>${escapeHtml(d.name)}</b><br>${escapeHtml(d.message)}`;
+
+        const box = document.createElement("div");
+        box.className = "reactions";
+
+        ["😄","🔥","💀","❤️","⚡"].forEach(emo => {
+            const btn   = document.createElement("button");
+            const count = document.createElement("span");
+            count.className   = "reaction-count";
+            count.textContent = "0";
+            btn.textContent   = emo + " ";
+
+            btn.onclick = (e) => {
+                const userReactRef = ref(
+                    db,
+                    `rooms/${currentRoom}/messages/${msgId}/reactions/${emo}/${userId}`
+                );
+                set(userReactRef, true);
+                const rect = e.target.getBoundingClientRect();
+                spawnEmoji(rect.left + rect.width / 2, rect.top, emo);
+            };
+
+            const liveRef = ref(
+                db,
+                `rooms/${currentRoom}/messages/${msgId}/reactions/${emo}`
+            );
+            onValue(liveRef, (s) => {
+                const data = s.val() || {};
+                count.textContent = Object.keys(data).length;
+            });
+
+            btn.appendChild(count);
+            box.appendChild(btn);
+        });
+
+        div.appendChild(box);
+        document.getElementById("chat").appendChild(div);
+
+        const deleteTime = d.expiresAt || (d.time + 10 * 60 * 1000);
+        const timeLeft   = deleteTime - Date.now();
+
+        setTimeout(() => {
+            const msgRef = ref(db, `rooms/${currentRoom}/messages/${msgId}`);
+            remove(msgRef);
+        }, Math.max(timeLeft, 0));
+
+        document.getElementById("chat").scrollTop =
+            document.getElementById("chat").scrollHeight;
+    });
+}
+
+/* ░░ ESCAPE */
+function escapeHtml(text){
+    return (text || "").replace(/[&<>"']/g, m => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[m]));
+}
+
+/* ░░ SEND */
+window.sendMessage = function(){
+    if(!chatRef) return;
+    const name    = document.getElementById("name").value || "Ghost";
+    const message = document.getElementById("message").value;
+    if(!message.trim()) return;
+    push(chatRef, {
+        name,
+        message,
+        time:      Date.now(),
+        expiresAt: Date.now() + 10 * 60 * 1000
+    });
+    document.getElementById("message").value = "";
+};
+
+</script>
+
 </body>
 </html>
